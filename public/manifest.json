@@ -1,14 +1,14 @@
 {
   "name": "MGE Parrainage",
   "short_name": "MGE",
-  "description": "Application de suivi des élèves parrainés pour l'association MGE",
+  "description": "Application de suivi des élèves parrainés",
   "start_url": "/",
   "display": "standalone",
   "theme_color": "#4da6ff",
   "background_color": "#667eea",
   "icons": [
     {
-      "src": "https://mge-parrainage.vercel.app/favicon.ico",
+      "src": "/favicon.ico",
       "sizes": "64x64",
       "type": "image/x-icon"
     }

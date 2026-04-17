@@ -1,19 +1,22 @@
-// Service Worker simple pour PWA
 const CACHE_NAME = 'mge-cache-v1';
-const urlsToCache = ['/', '/index.html'];
+const urlsToCache = [
+  '/',
+  '/index.html',
+  '/manifest.json'
+];
 
-self.addEventListener('install', (event) => {
+// Installation : met en cache les fichiers
+self.addEventListener('install', event => {
   event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => {
-      return cache.addAll(urlsToCache);
-    })
+    caches.open(CACHE_NAME)
+      .then(cache => cache.addAll(urlsToCache))
   );
 });
 
-self.addEventListener('fetch', (event) => {
+// Récupération : sert les fichiers depuis le cache
+self.addEventListener('fetch', event => {
   event.respondWith(
-    caches.match(event.request).then((response) => {
-      return response || fetch(event.request);
-    })
+    caches.match(event.request)
+      .then(response => response || fetch(event.request))
   );
 });
