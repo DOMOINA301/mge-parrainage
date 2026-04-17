@@ -1,6 +1,6 @@
 import { useState } from "react";
-import axios from "axios";
 import { useNavigate, Link, useLocation } from "react-router-dom";
+import api from "../api/axios";
 
 export default function Login({ setIsAuth }) {
   const navigate = useNavigate();
@@ -19,11 +19,8 @@ export default function Login({ setIsAuth }) {
     setLoading(true);
 
     try {
-      // ✅ CORRECTION : Utiliser /login au lieu de /register
-      const res = await axios.post(
-        "http://localhost:5000/api/auth/login",  // ← CHANGÉ ICI
-        { email, password }
-      );
+      // ✅ Utilise api au lieu de axios avec URL complète
+      const res = await api.post("/auth/login", { email, password });
 
       localStorage.setItem("token", res.data.token);
       localStorage.setItem("user", JSON.stringify(res.data.user));
