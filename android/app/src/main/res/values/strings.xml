@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">MGE Parrainage</string>
+    <string name="title_activity_main">MGE Parrainage</string>
+    <string name="package_name">com.mge.parrainage</string>
+    <string name="custom_url_scheme">com.mge.parrainage</string>
+</resources>
