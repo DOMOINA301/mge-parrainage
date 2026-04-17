@@ -1,21 +1,16 @@
 {
-  "background_color": "#667eea",
-  "dir": "ltr",
-  "display": "standalone",
   "name": "MGE Parrainage",
-  "orientation": "any",
-  "scope": "/",
   "short_name": "MGE",
+  "description": "Application de suivi des élèves parrainés pour l'association MGE",
   "start_url": "/",
+  "display": "standalone",
   "theme_color": "#4da6ff",
+  "background_color": "#667eea",
   "icons": [
     {
-      "src": "/favicon.ico",
-      "type": "image/x-icon",
-      "width": 64,
-      "height": 64
+      "src": "https://mge-parrainage.vercel.app/favicon.ico",
+      "sizes": "64x64",
+      "type": "image/x-icon"
     }
-  ],
-  "id": "com.mge.parrainage",
-  "description": "Application de suivi des élèves parrainés pour l'association humanitaire Madagascar Grandir Ensemble (MGE)."
+  ]
 }
