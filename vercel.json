@@ -1,18 +1,13 @@
 {
-  "rewrites": [{ "source": "/(.*)", "destination": "/" }],
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
   "devCommand": "npm run dev",
   "installCommand": "npm install",
-  "routes": [
+  "framework": "vite",
+  "rewrites": [
     {
-      "src": "/assets/(.*)",
-      "dest": "/assets/$1",
-      "headers": { "Content-Type": "application/javascript" }
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/index.html"
+      "source": "/(.*)",
+      "destination": "/"
     }
   ]
 }
