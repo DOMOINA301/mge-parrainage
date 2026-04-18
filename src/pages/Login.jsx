@@ -1,10 +1,11 @@
 import { useState } from "react";
 import { useNavigate, Link, useLocation } from "react-router-dom";
-import api from "../api/axios";
+import { useAuth } from "../context/AuthContext";
 
-export default function Login({ setIsAuth }) {
+export default function Login() {
   const navigate = useNavigate();
   const location = useLocation();
+  const { login } = useAuth();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -19,28 +20,17 @@ export default function Login({ setIsAuth }) {
     setLoading(true);
 
     try {
-      // Appel API vers Render
-      const res = await api.post("/auth/login", { email, password });
+      const result = await login(email, password);
 
-      // Stockage du token et des infos utilisateur
-      localStorage.setItem("token", res.data.token);
-      localStorage.setItem("user", JSON.stringify(res.data.user));
-
-      console.log("✅ Login réussi, redirection vers /accueil...");
-      setIsAuth(true);
-      navigate("/accueil", { replace: true });
-
+      if (result.success) {
+        console.log("✅ Login réussi, redirection vers /accueil...");
+        navigate("/accueil", { replace: true });
+      } else {
+        setError(result.message);
+      }
     } catch (err) {
       console.error("❌ Erreur login:", err);
-      console.error("Détails:", err.response?.data);
-      
-      if (err.response?.status === 401) {
-        setError("Email ou mot de passe incorrect");
-      } else if (err.code === "ERR_NETWORK") {
-        setError("Impossible de contacter le serveur. Vérifiez votre connexion.");
-      } else {
-        setError(err.response?.data?.message || "Une erreur est survenue");
-      }
+      setError("Une erreur est survenue");
     } finally {
       setLoading(false);
     }
@@ -51,7 +41,6 @@ export default function Login({ setIsAuth }) {
       <style>{globalStyles}</style>
       <div style={styles.container}>
         <div style={styles.card}>
-          {/* Logo */}
           <div style={styles.logoContainer}>
             <svg width="60" height="60" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
               <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z" fill="#4da6ff"/>
@@ -78,7 +67,7 @@ export default function Login({ setIsAuth }) {
               <label style={styles.label}>Email</label>
               <input
                 type="email"
-                placeholder="votre@email.com"
+                placeholder="admin@gmail.com"
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
@@ -123,7 +112,6 @@ export default function Login({ setIsAuth }) {
   );
 }
 
-// Styles
 const styles = {
   container: {
     minHeight: "100vh",

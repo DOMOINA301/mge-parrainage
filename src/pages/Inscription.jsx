@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import api from "../api/axios";
+import { saveStudent } from "../services/localStorageService";
 import ConfirmModal from "../components/ConfirmModal";
 
 export default function Inscription() {
@@ -15,17 +15,17 @@ export default function Inscription() {
     classe: "",
     telephone: "",
     adresse: "",
-    statut: "actif"  // ← MINUSCULES
+    statut: "actif"
   });
   const [photo, setPhoto] = useState(null);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     
-    // CORRECTION: Force les minuscules pour le statut
     if (name === "statut") {
       setForm({ ...form, [name]: value.toLowerCase() });
     } else {
@@ -45,57 +45,29 @@ export default function Inscription() {
   const confirmSubmit = async () => {
     setShowConfirmModal(false);
     setLoading(true);
-  
+    setError("");
+
     try {
-      // 🔍 VÉRIFICATION DU STATUT
-      console.log("🔍 1. Statut avant correction:", form.statut);
-      console.log("🔍 2. Type du statut:", typeof form.statut);
+      // Préparer les données de l'étudiant
+      const studentData = {
+        ...form,
+        statut: String(form.statut).toLowerCase().trim(),
+        photo: photo ? URL.createObjectURL(photo) : null,
+        createdAt: new Date().toISOString()
+      };
+
+      console.log("📝 Données à sauvegarder:", studentData);
+
+      // Sauvegarde dans le stockage local
+      await saveStudent(studentData);
       
-      // 🔍 CORRECTION FORCÉE
-      const statutCorrige = String(form.statut).toLowerCase();
-      console.log("🔍 3. Statut après correction:", statutCorrige);
-      
-      // Création du FormData
-      const data = new FormData();
-      
-      // Ajout de tous les champs avec statut corrigé
-      Object.keys(form).forEach((key) => {
-        let value = form[key];
-        
-        // CORRECTION RADICALE pour le statut
-        if (key === "statut") {
-          value = String(value).toLowerCase().trim();
-          console.log(`🔍 4. ${key} corrigé:`, value);
-        }
-        
-        data.append(key, value);
-        console.log(`🔍 5. Champ ${key}:`, value);
-      });
-      
-      if (photo) {
-        console.log("🔍 6. Photo:", photo.name);
-        data.append("photo", photo);
-      }
-  
-      // 🔍 VÉRIFICATION FINALE
-      console.log("🔍 7. Vérification FormData:");
-      for (let pair of data.entries()) {
-        console.log(pair[0] + ": " + pair[1]);
-      }
-  
-      const response = await api.post("/students", data);
-      console.log("✅ Succès:", response.data);
+      console.log("✅ Inscription réussie");
       setShowSuccessModal(true);
       
-    } catch (error) {
-      console.error("❌ ERREUR:", error);
-      if (error.response) {
-        console.error("Status:", error.response.status);
-        console.error("Data:", error.response.data);
-        alert(`❌ Erreur ${error.response.status}: ${error.response.data?.message}`);
-      } else {
-        alert("❌ Erreur lors de l'inscription");
-      }
+    } catch (err) {
+      console.error("❌ Erreur:", err);
+      setError("Erreur lors de l'inscription");
+      alert("❌ Erreur lors de l'inscription");
     } finally {
       setLoading(false);
     }
@@ -130,6 +102,7 @@ export default function Inscription() {
                 placeholder="Nom"
                 required
                 style={styles.input}
+                disabled={loading}
               />
             </div>
             <div style={styles.formGroup}>
@@ -141,6 +114,7 @@ export default function Inscription() {
                 placeholder="Prénom"
                 required
                 style={styles.input}
+                disabled={loading}
               />
             </div>
           </div>
@@ -153,6 +127,7 @@ export default function Inscription() {
               value={form.sexe}
               onChange={handleChange}
               style={styles.select}
+              disabled={loading}
             >
               <option value="">Sélectionner</option>
               <option value="Homme">Homme</option>
@@ -169,6 +144,7 @@ export default function Inscription() {
               onChange={handleChange}
               placeholder="Université"
               style={styles.input}
+              disabled={loading}
             />
           </div>
 
@@ -182,6 +158,7 @@ export default function Inscription() {
                 onChange={handleChange}
                 placeholder="Parcours"
                 style={styles.input}
+                disabled={loading}
               />
             </div>
             <div style={styles.formGroup}>
@@ -192,6 +169,7 @@ export default function Inscription() {
                 onChange={handleChange}
                 placeholder="Classe"
                 style={styles.input}
+                disabled={loading}
               />
             </div>
           </div>
@@ -206,6 +184,7 @@ export default function Inscription() {
               placeholder="Téléphone"
               required
               style={styles.input}
+              disabled={loading}
             />
           </div>
 
@@ -218,10 +197,11 @@ export default function Inscription() {
               onChange={handleChange}
               placeholder="Adresse"
               style={styles.input}
+              disabled={loading}
             />
           </div>
 
-          {/* Ligne 7: Statut - CORRIGÉ */}
+          {/* Ligne 7: Statut */}
           <div style={styles.formGroup}>
             <label style={styles.label}>Statut initial</label>
             <select
@@ -229,6 +209,7 @@ export default function Inscription() {
               value={form.statut}
               onChange={handleChange}
               style={styles.select}
+              disabled={loading}
             >
               <option value="actif">Actif</option>
               <option value="suspendu">Suspendu</option>
@@ -243,6 +224,7 @@ export default function Inscription() {
               accept="image/*"
               onChange={handleFileChange}
               style={styles.fileInput}
+              disabled={loading}
             />
             <span style={styles.fileHint}>Format accepté : jpg, png</span>
           </div>
@@ -416,11 +398,11 @@ const styles = {
   submitButton: {
     flex: 2,
     padding: '12px',
-    backgroundColor: '#f0f0f0',
-    border: '1px solid #d0d0d0',
+    backgroundColor: '#4da6ff',
+    border: 'none',
     borderRadius: '8px',
     fontSize: '14px',
-    color: '#333333',
+    color: '#ffffff',
     cursor: 'pointer',
   },
 
