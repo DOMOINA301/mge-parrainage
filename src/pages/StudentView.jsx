@@ -1,10 +1,12 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { getStudentById } from "../services/localStorageService";
+import { useAuth } from "../context/AuthContext";
 
 export default function StudentView() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { canCreateSituation } = useAuth();
   const [student, setStudent] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -54,9 +56,18 @@ export default function StudentView() {
         </div>
 
         <div style={styles.actionButtons}>
-          <button onClick={() => navigate(`/students/${id}/situations/new`)} style={{...styles.actionButton, backgroundColor: '#4da6ff'}}>➕ Nouvelle situation</button>
-          <button onClick={() => navigate(`/students/${id}/situations`)} style={{...styles.actionButton, backgroundColor: '#27ae60'}}>📋 Situations</button>
-          <button onClick={() => navigate(`/students/${id}/history`)} style={{...styles.actionButton, backgroundColor: '#f39c12'}}>📜 Historique</button>
+          {/* Nouvelle situation - visible seulement pour RESPONSABLE */}
+          {canCreateSituation() && (
+            <button onClick={() => navigate(`/students/${id}/situations/new`)} style={{...styles.actionButton, backgroundColor: '#4da6ff'}}>
+              ➕ Nouvelle situation
+            </button>
+          )}
+          <button onClick={() => navigate(`/students/${id}/situations`)} style={{...styles.actionButton, backgroundColor: '#27ae60'}}>
+            📋 Situations
+          </button>
+          <button onClick={() => navigate(`/students/${id}/history`)} style={{...styles.actionButton, backgroundColor: '#f39c12'}}>
+            📜 Historique
+          </button>
         </div>
 
         <div style={styles.infoGrid}>

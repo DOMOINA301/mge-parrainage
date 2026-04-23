@@ -5,7 +5,7 @@ import { useAuth } from "../context/AuthContext";
 
 export default function Accueil() {
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, canManageStudents } = useAuth();
   const [stats, setStats] = useState({ totalStudents: 0, totalSituations: 0, actifs: 0, suspendus: 0 });
   const [recentStudents, setRecentStudents] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -58,10 +58,12 @@ export default function Accueil() {
         )}
       </div>
 
-      <div style={styles.actions}>
-        <button style={styles.actionButton} onClick={() => navigate('/inscription')}>➕ Nouvel élève</button>
-        <button style={styles.actionButton} onClick={() => navigate('/students')}>📋 Voir tous</button>
-      </div>
+      {/* Bouton "Nouvel élève" - visible seulement pour RESPONSABLE */}
+      {canManageStudents() && (
+        <div style={styles.actions}>
+          <button style={styles.actionButton} onClick={() => navigate('/inscription')}>➕ Nouvel élève</button>
+        </div>
+      )}
     </div>
   );
 }
@@ -85,6 +87,6 @@ const styles = {
   studentName: { fontSize: "16px", fontWeight: "500", color: "#333", marginBottom: "4px" },
   studentInfo: { fontSize: "14px", color: "#666" },
   studentArrow: { fontSize: "20px", color: "#ccc" },
-  actions: { display: "flex", gap: "12px", flexWrap: "wrap" },
+  actions: { display: "flex", gap: "12px", flexWrap: "wrap", marginTop: "8px" },
   actionButton: { flex: 1, padding: "14px", fontSize: "16px", fontWeight: "500", color: "#fff", background: "#4da6ff", border: "none", borderRadius: "12px", cursor: "pointer", textAlign: "center" },
 };

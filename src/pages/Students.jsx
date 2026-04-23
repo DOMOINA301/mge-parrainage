@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { getStudents, deleteStudent } from "../services/localStorageService";
+import { useAuth } from "../context/AuthContext";
 import * as XLSX from "xlsx";
 import jsPDF from "jspdf";
 import ConfirmModal from "../components/ConfirmModal";
@@ -16,6 +17,7 @@ export default function Students() {
   const [studentToDelete, setStudentToDelete] = useState(null);
   const [showBulkDeleteModal, setShowBulkDeleteModal] = useState(false);
   const navigate = useNavigate();
+  const { canEditStudent, canDeleteStudent } = useAuth();
 
   useEffect(() => {
     loadStudents();
@@ -149,9 +151,9 @@ export default function Students() {
         <div style={styles.actionButtons}>
           <button onClick={exportExcel} style={styles.excelButton}>📊 Excel</button>
           <button onClick={exportPDF} style={styles.pdfButton}>📑 PDF</button>
-          {selectedStudents.length > 0 && <button onClick={() => setShowBulkDeleteModal(true)} style={styles.deleteSelectedButton}>🗑️ Supprimer ({selectedStudents.length})</button>}
+          {canDeleteStudent() && selectedStudents.length > 0 && <button onClick={() => setShowBulkDeleteModal(true)} style={styles.deleteSelectedButton}>🗑️ Supprimer ({selectedStudents.length})</button>}
         </div>
-        {filteredStudents.length > 0 && (
+        {canDeleteStudent() && filteredStudents.length > 0 && (
           <div style={styles.selectAll}>
             <label style={styles.checkboxLabel}>
               <input type="checkbox" checked={selectedStudents.length === filteredStudents.length} onChange={toggleSelectAll} style={styles.checkbox} />
@@ -167,9 +169,11 @@ export default function Students() {
         <div style={viewMode === "grid" ? styles.gridView : styles.listView}>
           {filteredStudents.map((s) => (
             <div key={s.id} style={{...styles.studentCard, ...(selectedStudents.includes(s.id) ? styles.studentCardSelected : {})}}>
-              <div style={styles.cardCheckbox}>
-                <input type="checkbox" checked={selectedStudents.includes(s.id)} onChange={() => toggleSelectStudent(s.id)} style={styles.checkbox} />
-              </div>
+              {canDeleteStudent() && (
+                <div style={styles.cardCheckbox}>
+                  <input type="checkbox" checked={selectedStudents.includes(s.id)} onChange={() => toggleSelectStudent(s.id)} style={styles.checkbox} />
+                </div>
+              )}
               <div style={styles.studentPhoto}>
                 <div style={styles.photoPlaceholder}>{s.nom?.[0]}{s.prenom?.[0]}</div>
               </div>
@@ -182,9 +186,13 @@ export default function Students() {
               </div>
               <div style={styles.cardActions}>
                 <button onClick={() => navigate(`/students/${s.id}`)} style={styles.actionButton}>👁️</button>
-                <button onClick={() => navigate(`/students/${s.id}/edit`)} style={styles.actionButton}>✏️</button>
+                {canEditStudent() && (
+                  <button onClick={() => navigate(`/students/${s.id}/edit`)} style={styles.actionButton}>✏️</button>
+                )}
                 <button onClick={() => window.location.href = `tel:${s.telephone}`} style={styles.actionButton}>📞</button>
-                <button onClick={() => { setStudentToDelete(s.id); setShowDeleteModal(true); }} style={styles.actionButton}>🗑️</button>
+                {canDeleteStudent() && (
+                  <button onClick={() => { setStudentToDelete(s.id); setShowDeleteModal(true); }} style={styles.actionButton}>🗑️</button>
+                )}
               </div>
             </div>
           ))}

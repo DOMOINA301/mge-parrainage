@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { ThemeProvider } from './context/ThemeContext';
 import { AuthProvider, useAuth } from './context/AuthContext';
+import ProtectedRoute from './components/ProtectedRoute';
 
 import Login from "./pages/Login";
 import Register from "./pages/Register";
@@ -17,7 +18,7 @@ import Settings from "./pages/Settings";
 import Layout from "./Layout";
 
 function AppRoutes() {
-  const { user, loading } = useAuth();
+  const { user, loading, canManageStudents } = useAuth();
 
   if (loading) {
     return (
@@ -39,17 +40,27 @@ function AppRoutes() {
       <Route path="/login" element={!user ? <Login /> : <Navigate to="/accueil" />} />
       <Route path="/register" element={<Register />} />
       
+      {/* Route Inscription - seulement pour RESPONSABLE */}
+      {user && canManageStudents() && (
+        <Route path="/inscription" element={<Inscription />} />
+      )}
+      
       <Route element={user ? <Layout /> : <Navigate to="/login" />}>
         <Route path="/accueil" element={<Accueil />} />
-        <Route path="/inscription" element={<Inscription />} />
         <Route path="/students" element={<Students />} />
         <Route path="/students/:id" element={<StudentView />} />
-        <Route path="/students/:id/edit" element={<EditStudent />} />
         <Route path="/students/:id/history" element={<StudentHistory />} />
         <Route path="/students/:studentId/situations" element={<SituationsList />} />
-        <Route path="/students/:studentId/situations/new" element={<CreateSituation />} />
         <Route path="/situations/:id" element={<SituationView />} />
         <Route path="/settings" element={<Settings />} />
+        
+        {/* Routes réservées RESPONSABLE */}
+        {canManageStudents() && (
+          <>
+            <Route path="/students/:id/edit" element={<EditStudent />} />
+            <Route path="/students/:studentId/situations/new" element={<CreateSituation />} />
+          </>
+        )}
       </Route>
       
       <Route path="*" element={<Navigate to="/" />} />

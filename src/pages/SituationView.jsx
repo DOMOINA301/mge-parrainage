@@ -1,10 +1,12 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { getSituationById, updateSituationStatus } from "../services/localStorageService";
+import { useAuth } from "../context/AuthContext";
 
 export default function SituationView() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { user, canValidateSituation } = useAuth();
   const [situation, setSituation] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -63,20 +65,22 @@ export default function SituationView() {
           <p>{situation.description || "Aucune description"}</p>
         </div>
 
-        <div style={styles.actionsSection}>
-          <h3>Mettre à jour le statut</h3>
-          <div style={styles.statusButtons}>
-            {situation.statut === "EN_ATTENTE_RESPONSABLE" && (
-              <>
-                <button onClick={() => updateStatus("VALIDEE_RESPONSABLE")} style={{...styles.button, backgroundColor: "#27ae60"}}>✅ Valider (Responsable)</button>
-                <button onClick={() => updateStatus("REFUSEE_RESPONSABLE")} style={{...styles.button, backgroundColor: "#e74c3c"}}>❌ Refuser (Responsable)</button>
-              </>
-            )}
-            {situation.statut === "VALIDEE_RESPONSABLE" && (
-              <button onClick={() => updateStatus("VALIDEE_SPONSOR")} style={{...styles.button, backgroundColor: "#27ae60"}}>✅ Valider (Sponsor)</button>
-            )}
+        {canValidateSituation() && (
+          <div style={styles.actionsSection}>
+            <h3>Mettre à jour le statut</h3>
+            <div style={styles.statusButtons}>
+              {situation.statut === "EN_ATTENTE_RESPONSABLE" && (
+                <>
+                  <button onClick={() => updateStatus("VALIDEE_RESPONSABLE")} style={{...styles.button, backgroundColor: "#27ae60"}}>✅ Valider</button>
+                  <button onClick={() => updateStatus("REFUSEE_RESPONSABLE")} style={{...styles.button, backgroundColor: "#e74c3c"}}>❌ Refuser</button>
+                </>
+              )}
+              {situation.statut === "VALIDEE_RESPONSABLE" && (
+                <button onClick={() => updateStatus("VALIDEE_SPONSOR")} style={{...styles.button, backgroundColor: "#27ae60"}}>✅ Valider la demande (Sponsor)</button>
+              )}
+            </div>
           </div>
-        </div>
+        )}
       </div>
     </div>
   );
@@ -84,7 +88,7 @@ export default function SituationView() {
 
 const styles = {
   container: { padding: '16px', backgroundColor: '#f5f7fb', minHeight: '100vh' },
-  header: { display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '24px' },
+  header: { display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '24px', flexWrap: 'wrap' },
   backButton: { padding: '10px 16px', backgroundColor: '#fff', border: 'none', borderRadius: '10px', cursor: 'pointer', color: '#4da6ff' },
   title: { fontSize: '24px', fontWeight: '600', color: '#333', margin: 0 },
   loading: { textAlign: 'center', padding: '50px' },
@@ -99,3 +103,10 @@ const styles = {
   statusButtons: { display: 'flex', gap: '12px', flexWrap: 'wrap', marginTop: '12px' },
   button: { padding: '12px 24px', border: 'none', borderRadius: '10px', color: '#fff', cursor: 'pointer' },
 };
+
+const globalStyles = `
+  @media (max-width: 480px) {
+    .infoGrid { grid-template-columns: 1fr !important; }
+    button { width: 100% !important; }
+  }
+`;

@@ -1,10 +1,12 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { getSituationsByStudent } from "../services/localStorageService";
+import { useAuth } from "../context/AuthContext";
 
 export default function SituationsList() {
   const { studentId } = useParams();
   const navigate = useNavigate();
+  const { canCreateSituation } = useAuth();
   const [situations, setSituations] = useState([]);
 
   useEffect(() => {
@@ -20,7 +22,12 @@ export default function SituationsList() {
     <div style={styles.container}>
       <div style={styles.header}>
         <button onClick={() => navigate(`/students/${studentId}`)} style={styles.backButton}>← Retour</button>
-        <button onClick={() => navigate(`/students/${studentId}/situations/new`)} style={styles.addButton}>+ Nouvelle situation</button>
+        {/* Bouton Nouvelle situation - visible seulement pour RESPONSABLE */}
+        {canCreateSituation() && (
+          <button onClick={() => navigate(`/students/${studentId}/situations/new`)} style={styles.addButton}>
+            + Nouvelle situation
+          </button>
+        )}
       </div>
 
       <h1 style={styles.title}>Situations de l'étudiant</h1>
