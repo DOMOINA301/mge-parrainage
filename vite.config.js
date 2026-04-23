@@ -10,6 +10,7 @@ export default defineConfig({
   },
   build: {
     outDir: 'dist',
-    assetsDir: 'assets'
+    assetsDir: 'assets',
+    chunkSizeWarningLimit: 1000  // ← AJOUTE CETTE LIGNE (limite à 1000 kB)
   }
 })
