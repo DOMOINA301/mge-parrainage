@@ -1,0 +1,9 @@
+/* Styles spécifiques Android */
+button {
+  min-height: 48px;
+  min-width: 48px;
+}
+
+input, select, textarea {
+  font-size: 16px;
+}
