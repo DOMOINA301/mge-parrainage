@@ -6,7 +6,7 @@ import { useAuth } from "../context/AuthContext";
 export default function SituationView() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { user, canValidateSituation, isSponsor, isAdmin } = useAuth();
+  const { user, isSponsor } = useAuth();
   const [situation, setSituation] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -31,9 +31,9 @@ export default function SituationView() {
   };
 
   const getStatusStyle = (statut) => {
-    if (statut?.includes("VALIDEE")) return { bg: "#e6f7e6", color: "#27ae60" };
-    if (statut?.includes("REFUSEE")) return { bg: "#ffe6e6", color: "#e74c3c" };
-    return { bg: "#fff3e0", color: "#f39c12" };
+    if (statut === "VALIDEE") return { bg: "#e6f7e6", color: "#27ae60", text: "✅ Validée (Sponsor)" };
+    if (statut === "REFUSEE") return { bg: "#ffe6e6", color: "#e74c3c", text: "❌ Refusée (Sponsor)" };
+    return { bg: "#fff3e0", color: "#f39c12", text: "⏳ En attente de validation" };
   };
 
   if (loading) return <div style={styles.loading}>Chargement...</div>;
@@ -51,7 +51,9 @@ export default function SituationView() {
       <div style={styles.card}>
         <div style={styles.badgeContainer}>
           {situation.urgence && <span style={styles.urgentBadge}>⚠️ URGENT</span>}
-          <span style={{...styles.statusBadge, backgroundColor: statusStyle.bg, color: statusStyle.color}}>{situation.statut}</span>
+          <span style={{...styles.statusBadge, backgroundColor: statusStyle.bg, color: statusStyle.color}}>
+            {statusStyle.text}
+          </span>
         </div>
 
         <div style={styles.infoGrid}>
@@ -65,32 +67,25 @@ export default function SituationView() {
           <p>{situation.description || "Aucune description"}</p>
         </div>
 
-        {/* Seul SPONSOR ou ADMIN peut valider */}
-        {canValidateSituation() && (
+        {/* Seul le SPONSOR peut valider/refuser */}
+        {isSponsor() && situation.statut === "EN_ATTENTE" && (
           <div style={styles.actionsSection}>
-            <h3>Mettre à jour le statut</h3>
+            <h3>Décision du Sponsor</h3>
             <div style={styles.statusButtons}>
-              {situation.statut === "EN_ATTENTE_RESPONSABLE" && (
-                <>
-                  <button onClick={() => updateStatus("VALIDEE_RESPONSABLE")} style={{...styles.button, backgroundColor: "#27ae60"}}>
-                    ✅ Valider
-                  </button>
-                  <button onClick={() => updateStatus("REFUSEE_RESPONSABLE")} style={{...styles.button, backgroundColor: "#e74c3c"}}>
-                    ❌ Refuser
-                  </button>
-                </>
-              )}
-              {situation.statut === "VALIDEE_RESPONSABLE" && isSponsor() && (
-                <button onClick={() => updateStatus("VALIDEE_SPONSOR")} style={{...styles.button, backgroundColor: "#27ae60"}}>
-                  ✅ Valider la demande (Sponsor)
-                </button>
-              )}
-              {situation.statut === "VALIDEE_RESPONSABLE" && isAdmin() && (
-                <button onClick={() => updateStatus("VALIDEE_SPONSOR")} style={{...styles.button, backgroundColor: "#27ae60"}}>
-                  ✅ Valider la demande (Admin)
-                </button>
-              )}
+              <button onClick={() => updateStatus("VALIDEE")} style={{...styles.button, backgroundColor: "#27ae60"}}>
+                ✅ Valider la demande (Sponsor)
+              </button>
+              <button onClick={() => updateStatus("REFUSEE")} style={{...styles.button, backgroundColor: "#e74c3c"}}>
+                ❌ Refuser la demande (Sponsor)
+              </button>
             </div>
+          </div>
+        )}
+
+        {/* Message si déjà traité */}
+        {situation.statut !== "EN_ATTENTE" && (
+          <div style={styles.alreadyProcessed}>
+            <p>Cette demande a été {situation.statut === "VALIDEE" ? "validée" : "refusée"} par le sponsor.</p>
           </div>
         )}
       </div>
@@ -114,6 +109,7 @@ const styles = {
   actionsSection: { borderTop: '1px solid #e0e0e0', paddingTop: '24px' },
   statusButtons: { display: 'flex', gap: '12px', flexWrap: 'wrap', marginTop: '12px' },
   button: { padding: '12px 24px', border: 'none', borderRadius: '10px', color: '#fff', cursor: 'pointer' },
+  alreadyProcessed: { marginTop: '20px', padding: '16px', backgroundColor: '#f0f0f0', borderRadius: '12px', textAlign: 'center', color: '#666' },
 };
 
 const globalStyles = `

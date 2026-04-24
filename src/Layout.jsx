@@ -41,8 +41,8 @@ export default function Layout() {
       fontSize: getFontSize(),
     },
     header: {
-      backgroundColor: theme === 'dark' ? '#2d2d2d' : '#ffffff',
-      boxShadow: theme === 'dark' ? '0 2px 10px rgba(0,0,0,0.3)' : '0 2px 10px rgba(0,0,0,0.05)',
+      backgroundColor: '#ffffff',
+      boxShadow: '0 2px 10px rgba(0,0,0,0.05)',
       position: 'sticky',
       top: 0,
       zIndex: 1001,
@@ -77,9 +77,9 @@ export default function Layout() {
       gap: settings.compactMode ? '3px' : '5px',
     },
     burgerLine: {
-      width: settings.compactMode ? '20px' : '25px',
+      width: settings.compactMode ? '22px' : '25px',
       height: settings.compactMode ? '2px' : '3px',
-      backgroundColor: theme === 'dark' ? '#fff' : '#333',
+      backgroundColor: '#333',
       borderRadius: '3px',
       transition: 'all 0.3s ease',
     },
@@ -92,46 +92,76 @@ export default function Layout() {
       padding: settings.compactMode ? '0 12px' : '0 16px',
       height: settings.compactMode ? '40px' : '60px',
       transition: 'all 0.3s ease',
+      ...(isMobile && menuOpen ? {
+        position: 'fixed',
+        top: settings.compactMode ? '50px' : '70px',
+        left: 0,
+        right: 0,
+        bottom: 0,
+        backgroundColor: '#ffffff',
+        zIndex: 1000,
+        padding: '20px',
+        flexDirection: 'column',
+        justifyContent: 'flex-start',
+        alignItems: 'stretch',
+        gap: '16px',
+        overflowY: 'auto',
+        boxShadow: '0 4px 20px rgba(0,0,0,0.15)',
+      } : {}),
     },
     navLinks: {
       display: 'flex',
       gap: settings.compactMode ? '4px' : '8px',
       flexWrap: 'wrap',
+      ...(isMobile && menuOpen ? {
+        flexDirection: 'column',
+        width: '100%',
+        gap: '12px',
+      } : {}),
     },
     navLink: {
       display: 'flex',
       alignItems: 'center',
       gap: settings.compactMode ? '4px' : '8px',
-      padding: settings.compactMode ? '4px 12px' : '8px 16px',
-      color: theme === 'dark' ? '#aaa' : '#666',
+      padding: settings.compactMode ? '12px 16px' : '14px 20px',
+      color: '#333333',
       textDecoration: 'none',
-      fontSize: settings.compactMode ? '13px' : '15px',
+      fontSize: settings.compactMode ? '15px' : '16px',
       fontWeight: '500',
-      borderRadius: '8px',
+      borderRadius: '12px',
       cursor: 'pointer',
       transition: 'all 0.2s ease',
+      backgroundColor: '#f8f9fa',
+      ...(isMobile && menuOpen ? {
+        width: '100%',
+        justifyContent: 'flex-start',
+      } : {}),
     },
     navLinkActive: {
-      backgroundColor: theme === 'dark' ? '#3d3d3d' : '#e6f0ff',
+      backgroundColor: '#e6f0ff',
       color: '#4da6ff',
+      borderLeft: '4px solid #4da6ff',
     },
     navIcon: {
-      width: settings.compactMode ? '16px' : '20px',
-      height: settings.compactMode ? '16px' : '20px',
+      width: settings.compactMode ? '18px' : '20px',
+      height: settings.compactMode ? '18px' : '20px',
     },
     logoutButton: {
       display: 'flex',
       alignItems: 'center',
+      justifyContent: 'center',
       gap: settings.compactMode ? '4px' : '8px',
-      padding: settings.compactMode ? '4px 16px' : '8px 20px',
+      padding: settings.compactMode ? '12px 20px' : '14px 24px',
       backgroundColor: '#ff4757',
       color: '#ffffff',
       border: 'none',
-      borderRadius: '8px',
-      fontSize: settings.compactMode ? '13px' : '15px',
+      borderRadius: '12px',
+      fontSize: settings.compactMode ? '14px' : '16px',
       fontWeight: '500',
       cursor: 'pointer',
       transition: 'opacity 0.2s ease',
+      width: '100%',
+      marginTop: '8px',
     },
     overlay: {
       position: 'fixed',
@@ -180,6 +210,9 @@ export default function Layout() {
         .menu-slide {
           animation: slideIn 0.3s ease;
         }
+        .btn-hover:hover {
+          opacity: 0.9;
+        }
       `}</style>
       
       <div style={styles.container}>
@@ -198,23 +231,7 @@ export default function Layout() {
           </div>
         </header>
 
-        <nav style={{
-          ...styles.nav,
-          ...(isMobile ? {
-            display: menuOpen ? 'flex' : 'none',
-            position: 'fixed',
-            top: settings.compactMode ? '50px' : '70px',
-            left: 0,
-            right: 0,
-            bottom: 0,
-            backgroundColor: theme === 'dark' ? '#2d2d2d' : '#ffffff',
-            zIndex: 1000,
-            padding: settings.compactMode ? '16px' : '20px',
-            flexDirection: 'column',
-            justifyContent: 'flex-start',
-            gap: '20px',
-          } : {}),
-        }} className={menuOpen ? 'menu-slide' : ''}>
+        <nav style={styles.nav} className={menuOpen ? 'menu-slide' : ''}>
           <div style={styles.navLinks}>
             <Link to="/accueil" style={{...styles.navLink, ...(location.pathname === '/accueil' ? styles.navLinkActive : {})}} onClick={closeMenu}>
               <svg style={styles.navIcon} viewBox="0 0 24 24" fill="currentColor">
@@ -236,7 +253,6 @@ export default function Layout() {
               </svg> Étudiants
             </Link>
             
-            {/* Gestion des utilisateurs - visible seulement pour ADMIN */}
             {isAdmin() && (
               <Link to="/manage-users" style={{...styles.navLink, ...(location.pathname === '/manage-users' ? styles.navLinkActive : {})}} onClick={closeMenu}>
                 <svg style={styles.navIcon} viewBox="0 0 24 24" fill="currentColor">
