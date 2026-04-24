@@ -27,6 +27,12 @@ export const saveUser = async (user) => {
   return user;
 };
 
+export const deleteUser = async (userId) => {
+  let users = await getUsers();
+  users = users.filter(u => u.id !== userId);
+  await localforage.setItem('users', users);
+};
+
 export const findUserByEmail = async (email) => {
   const users = await getUsers();
   return users.find(u => u.email === email);
@@ -49,6 +55,36 @@ export const createDefaultAdmin = async () => {
     await localforage.setItem('users', users);
     console.log('✅ Admin créé localement');
   }
+};
+
+// Création d'admin avec clé secrète
+export const createAdminWithSecretKey = async (secretKey, userData) => {
+  const ADMIN_SECRET_KEY = 'MGE_ADMIN_SECRET_2026';
+  
+  if (secretKey !== ADMIN_SECRET_KEY) {
+    return { success: false, message: 'Clé secrète invalide' };
+  }
+  
+  const users = await getUsers();
+  const existingUser = users.find(u => u.email === userData.email);
+  
+  if (existingUser) {
+    return { success: false, message: 'Cet email existe déjà' };
+  }
+  
+  const newAdmin = {
+    id: Date.now().toString(),
+    nom: userData.nom,
+    email: userData.email,
+    password: btoa(userData.password),
+    role: 'ADMIN',
+    createdAt: new Date().toISOString(),
+    active: true
+  };
+  
+  users.push(newAdmin);
+  await localforage.setItem('users', users);
+  return { success: true, message: 'Admin créé avec succès' };
 };
 
 // ==================== ÉLÈVES ====================

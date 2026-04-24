@@ -21,13 +21,21 @@ export default function Register() {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
+  // Validation du mot de passe fort
+  const validatePassword = (password) => {
+    if (password.length < 8) return 'Le mot de passe doit contenir au moins 8 caractères';
+    if (!/[A-Z]/.test(password)) return 'Le mot de passe doit contenir une majuscule';
+    if (!/[a-z]/.test(password)) return 'Le mot de passe doit contenir une minuscule';
+    if (!/[0-9]/.test(password)) return 'Le mot de passe doit contenir un chiffre';
+    return null;
+  };
+
   const submit = async (e) => {
     e.preventDefault();
     setError("");
     setSuccess("");
     setLoading(true);
 
-    // Validation
     if (!form.nom.trim()) {
       setError("Le nom est requis");
       setLoading(false);
@@ -40,8 +48,10 @@ export default function Register() {
       return;
     }
 
-    if (form.password.length < 6) {
-      setError("Le mot de passe doit contenir au moins 6 caractères");
+    // Validation mot de passe fort
+    const passwordError = validatePassword(form.password);
+    if (passwordError) {
+      setError(passwordError);
       setLoading(false);
       return;
     }
@@ -114,7 +124,7 @@ export default function Register() {
             <input 
               name="password" 
               type="password" 
-              placeholder="6 caractères minimum" 
+              placeholder="8 caractères, 1 majuscule, 1 chiffre" 
               value={form.password} 
               onChange={handleChange} 
               required 
@@ -139,12 +149,10 @@ export default function Register() {
 
           <div style={styles.inputGroup}>
             <label style={styles.label}>Rôle</label>
-           // Dans Register.jsx, modifie le select des rôles :
-<select name="role" value={form.role} onChange={handleChange} style={styles.select} disabled={loading}>
-  <option value="RESPONSABLE">Responsable</option>
-  <option value="SPONSOR">Sponsor</option>
-  {/* Le rôle ADMIN n'est PAS disponible à l'inscription */}
-</select>
+            <select name="role" value={form.role} onChange={handleChange} style={styles.select} disabled={loading}>
+              <option value="RESPONSABLE">Responsable</option>
+              <option value="SPONSOR">Sponsor</option>
+            </select>
             <p style={styles.hint}>Le rôle ADMIN est réservé</p>
           </div>
 
@@ -240,12 +248,3 @@ const styles = {
   footer: { marginTop: "24px", textAlign: "center", color: "#666" },
   link: { color: "#4da6ff", textDecoration: "none", fontWeight: "500" }
 };
-
-// Styles responsifs
-const responsiveStyles = `
-  @media (max-width: 480px) {
-    .card { padding: 24px 16px; }
-    h2 { font-size: 20px; }
-    input, select, button { font-size: 16px !important; }
-  }
-`;

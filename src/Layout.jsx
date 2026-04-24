@@ -8,7 +8,7 @@ export default function Layout() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
   const { theme, settings } = useTheme();
-  const { logout, canManageStudents } = useAuth();
+  const { logout, canManageStudents, isAdmin } = useAuth();
 
   useEffect(() => {
     const handleResize = () => {
@@ -235,6 +235,15 @@ export default function Layout() {
                 <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
               </svg> Étudiants
             </Link>
+            
+            {/* Gestion des utilisateurs - visible seulement pour ADMIN */}
+            {isAdmin() && (
+              <Link to="/manage-users" style={{...styles.navLink, ...(location.pathname === '/manage-users' ? styles.navLinkActive : {})}} onClick={closeMenu}>
+                <svg style={styles.navIcon} viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                </svg> Utilisateurs
+              </Link>
+            )}
             
             <Link to="/settings" style={{...styles.navLink, ...(location.pathname === '/settings' ? styles.navLinkActive : {})}} onClick={closeMenu}>
               <svg style={styles.navIcon} viewBox="0 0 24 24" fill="currentColor">

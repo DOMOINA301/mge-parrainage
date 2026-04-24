@@ -98,14 +98,7 @@ export default function Login() {
             </button>
           </form>
 
-          <div style={styles.footer}>
-            <p style={styles.text}>
-              Pas encore de compte ?{" "}
-              <Link to="/register" style={styles.link}>
-                Créer un compte
-              </Link>
-            </p>
-          </div>
+          
         </div>
       </div>
     </>

@@ -6,7 +6,7 @@ import { useAuth } from "../context/AuthContext";
 export default function SituationView() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { user, canValidateSituation } = useAuth();
+  const { user, canValidateSituation, isSponsor, isAdmin } = useAuth();
   const [situation, setSituation] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -65,18 +65,30 @@ export default function SituationView() {
           <p>{situation.description || "Aucune description"}</p>
         </div>
 
+        {/* Seul SPONSOR ou ADMIN peut valider */}
         {canValidateSituation() && (
           <div style={styles.actionsSection}>
             <h3>Mettre à jour le statut</h3>
             <div style={styles.statusButtons}>
               {situation.statut === "EN_ATTENTE_RESPONSABLE" && (
                 <>
-                  <button onClick={() => updateStatus("VALIDEE_RESPONSABLE")} style={{...styles.button, backgroundColor: "#27ae60"}}>✅ Valider</button>
-                  <button onClick={() => updateStatus("REFUSEE_RESPONSABLE")} style={{...styles.button, backgroundColor: "#e74c3c"}}>❌ Refuser</button>
+                  <button onClick={() => updateStatus("VALIDEE_RESPONSABLE")} style={{...styles.button, backgroundColor: "#27ae60"}}>
+                    ✅ Valider
+                  </button>
+                  <button onClick={() => updateStatus("REFUSEE_RESPONSABLE")} style={{...styles.button, backgroundColor: "#e74c3c"}}>
+                    ❌ Refuser
+                  </button>
                 </>
               )}
-              {situation.statut === "VALIDEE_RESPONSABLE" && (
-                <button onClick={() => updateStatus("VALIDEE_SPONSOR")} style={{...styles.button, backgroundColor: "#27ae60"}}>✅ Valider la demande (Sponsor)</button>
+              {situation.statut === "VALIDEE_RESPONSABLE" && isSponsor() && (
+                <button onClick={() => updateStatus("VALIDEE_SPONSOR")} style={{...styles.button, backgroundColor: "#27ae60"}}>
+                  ✅ Valider la demande (Sponsor)
+                </button>
+              )}
+              {situation.statut === "VALIDEE_RESPONSABLE" && isAdmin() && (
+                <button onClick={() => updateStatus("VALIDEE_SPONSOR")} style={{...styles.button, backgroundColor: "#27ae60"}}>
+                  ✅ Valider la demande (Admin)
+                </button>
               )}
             </div>
           </div>

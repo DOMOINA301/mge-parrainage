@@ -3,7 +3,6 @@ import { ThemeProvider } from './context/ThemeContext';
 import { AuthProvider, useAuth } from './context/AuthContext';
 
 import Login from "./pages/Login";
-import Register from "./pages/Register";
 import Accueil from "./pages/Accueil";
 import Inscription from "./pages/Inscription";
 import Students from "./pages/Students";
@@ -15,9 +14,11 @@ import SituationsList from "./pages/SituationsList";
 import SituationView from "./pages/SituationView";
 import Settings from "./pages/Settings";
 import Layout from "./Layout";
+import CreateAdmin from "./pages/CreateAdmin";
+import ManageUsers from "./pages/ManageUsers";
 
 function AppRoutes() {
-  const { user, loading, canManageStudents } = useAuth();
+  const { user, loading, canManageStudents, isAdmin } = useAuth();
 
   if (loading) {
     return (
@@ -37,11 +38,18 @@ function AppRoutes() {
     <Routes>
       <Route path="/" element={<Navigate to={user ? "/accueil" : "/login"} />} />
       <Route path="/login" element={!user ? <Login /> : <Navigate to="/accueil" />} />
-      <Route path="/register" element={<Register />} />
       
       {/* Route Inscription - seulement pour RESPONSABLE */}
       {user && canManageStudents() && (
         <Route path="/inscription" element={<Inscription />} />
+      )}
+      
+      {/* Routes réservées ADMIN (gestion des comptes) */}
+      {user && isAdmin() && (
+        <>
+          <Route path="/create-admin" element={<CreateAdmin />} />
+          <Route path="/manage-users" element={<ManageUsers />} />
+        </>
       )}
       
       <Route element={user ? <Layout /> : <Navigate to="/login" />}>
@@ -53,7 +61,7 @@ function AppRoutes() {
         <Route path="/situations/:id" element={<SituationView />} />
         <Route path="/settings" element={<Settings />} />
         
-        {/* Routes réservées RESPONSABLE */}
+        {/* Routes réservées RESPONSABLE (création et modification) */}
         {canManageStudents() && (
           <>
             <Route path="/students/:id/edit" element={<EditStudent />} />

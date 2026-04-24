@@ -17,7 +17,7 @@ export const AuthProvider = ({ children }) => {
 
   useEffect(() => {
     const init = async () => {
-      await initDatabase(); // ← Crée l'admin par défaut
+      await initDatabase();
       const storedUser = localStorage.getItem('mge_user');
       if (storedUser) {
         try {
@@ -60,13 +60,19 @@ export const AuthProvider = ({ children }) => {
         return { success: false, message: 'Cet email est déjà utilisé' };
       }
       
+      let role = userData.role || 'RESPONSABLE';
+      if (role === 'ADMIN') {
+        role = 'RESPONSABLE';
+      }
+      
       const newUser = {
         id: Date.now().toString(),
         nom: userData.nom,
         email: userData.email,
         password: btoa(userData.password),
-        role: userData.role || 'RESPONSABLE',
-        createdAt: new Date().toISOString()
+        role: role,
+        createdAt: new Date().toISOString(),
+        active: true
       };
       await saveUser(newUser);
       return { success: true, message: 'Compte créé avec succès' };
@@ -76,8 +82,26 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  // Permissions
+  const hasRole = (requiredRole) => {
+    if (!user) return false;
+    if (typeof requiredRole === 'string') {
+      return user.role === requiredRole;
+    }
+    return requiredRole.includes(user.role);
+  };
+
+  // ============ PERMISSIONS ============
+  
+  // RESPONSABLE : peut tout gérer (étudiants, situations)
   const canManageStudents = () => {
+    return user?.role === 'RESPONSABLE';
+  };
+
+  const canEditStudent = () => {
+    return user?.role === 'RESPONSABLE';
+  };
+
+  const canDeleteStudent = () => {
     return user?.role === 'RESPONSABLE';
   };
 
@@ -85,8 +109,22 @@ export const AuthProvider = ({ children }) => {
     return user?.role === 'RESPONSABLE';
   };
 
+  // SPONSOR (ET ADMIN) : peut seulement VALIDER les demandes d'aide
   const canValidateSituation = () => {
+    return user?.role === 'SPONSOR' || user?.role === 'ADMIN';
+  };
+
+  // Vérifications de rôles
+  const isAdmin = () => {
     return user?.role === 'ADMIN';
+  };
+
+  const isResponsable = () => {
+    return user?.role === 'RESPONSABLE';
+  };
+
+  const isSponsor = () => {
+    return user?.role === 'SPONSOR';
   };
 
   const value = {
@@ -95,9 +133,15 @@ export const AuthProvider = ({ children }) => {
     login,
     logout,
     register,
+    hasRole,
     canManageStudents,
+    canEditStudent,
+    canDeleteStudent,
     canCreateSituation,
-    canValidateSituation
+    canValidateSituation,
+    isAdmin,
+    isResponsable,
+    isSponsor
   };
 
   return (
