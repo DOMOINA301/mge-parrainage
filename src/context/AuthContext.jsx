@@ -17,7 +17,7 @@ export const AuthProvider = ({ children }) => {
 
   useEffect(() => {
     const init = async () => {
-      await initDatabase();
+      await initDatabase(); // ← Crée l'admin par défaut
       const storedUser = localStorage.getItem('mge_user');
       if (storedUser) {
         try {
@@ -76,55 +76,17 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const hasRole = (roles) => {
-    if (!user) return false;
-    if (typeof roles === 'string') return user.role === roles;
-    return roles.includes(user.role);
-  };
-
-  // ========== PERMISSIONS ==========
-  
-  // RESPONSABLE peut tout gérer (inscription, modification, suppression, création situation)
+  // Permissions
   const canManageStudents = () => {
-    return hasRole(['RESPONSABLE']); // Seul RESPONSABLE peut gérer les étudiants
+    return user?.role === 'RESPONSABLE';
   };
-  
-  const canEditStudent = () => {
-    return hasRole(['RESPONSABLE']); // Seul RESPONSABLE peut modifier
-  };
-  
-  const canDeleteStudent = () => {
-    return hasRole(['RESPONSABLE']); // Seul RESPONSABLE peut supprimer
-  };
-  
+
   const canCreateSituation = () => {
-    return hasRole(['RESPONSABLE']); // Seul RESPONSABLE peut créer une situation
+    return user?.role === 'RESPONSABLE';
   };
-  
-  // ADMIN (Sponsor) peut seulement valider/refuser les situations
+
   const canValidateSituation = () => {
-    return hasRole(['ADMIN']); // Seul ADMIN (Sponsor) peut valider
-  };
-  
-  // Les deux peuvent voir
-  const canViewStudents = () => {
-    return hasRole(['ADMIN', 'RESPONSABLE']);
-  };
-  
-  const canViewSituations = () => {
-    return hasRole(['ADMIN', 'RESPONSABLE']);
-  };
-
-  const isSponsor = () => {
-    return hasRole(['ADMIN']);
-  };
-
-  const isResponsable = () => {
-    return hasRole(['RESPONSABLE']);
-  };
-
-  const isAdmin = () => {
-    return hasRole(['ADMIN']);
+    return user?.role === 'ADMIN';
   };
 
   const value = {
@@ -133,17 +95,9 @@ export const AuthProvider = ({ children }) => {
     login,
     logout,
     register,
-    hasRole,
     canManageStudents,
-    canEditStudent,
-    canDeleteStudent,
     canCreateSituation,
-    canValidateSituation,
-    canViewStudents,
-    canViewSituations,
-    isSponsor,
-    isResponsable,
-    isAdmin
+    canValidateSituation
   };
 
   return (

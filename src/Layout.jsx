@@ -8,7 +8,7 @@ export default function Layout() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
   const { theme, settings } = useTheme();
-  const { user, logout, canManageStudents } = useAuth();
+  const { logout, canManageStudents } = useAuth();
 
   useEffect(() => {
     const handleResize = () => {
@@ -32,17 +32,6 @@ export default function Layout() {
       default: return '16px';
     }
   };
-
-  const getRoleBadge = () => {
-    switch(user?.role) {
-      case 'ADMIN': return { bg: '#e74c3c', label: 'Admin' };
-      case 'RESPONSABLE': return { bg: '#27ae60', label: 'Responsable' };
-      case 'SPONSOR': return { bg: '#f39c12', label: 'Sponsor' };
-      default: return { bg: '#95a5a6', label: user?.role || 'Utilisateur' };
-    }
-  };
-
-  const roleBadge = getRoleBadge();
 
   const styles = {
     container: {
@@ -77,20 +66,6 @@ export default function Layout() {
       display: 'flex',
       alignItems: 'center',
       gap: '12px',
-    },
-    userName: {
-      fontSize: settings.compactMode ? '12px' : '14px',
-      color: theme === 'dark' ? '#aaa' : '#666',
-    },
-    roleBadge: {
-      backgroundColor: roleBadge.bg,
-      color: '#fff',
-      padding: '4px 12px',
-      borderRadius: '20px',
-      fontSize: '12px',
-      fontWeight: '600',
-      display: 'inline-block',
-      boxShadow: '0 1px 3px rgba(0,0,0,0.2)',
     },
     burgerButton: {
       background: 'none',
@@ -212,8 +187,6 @@ export default function Layout() {
           <div style={styles.headerContent}>
             <h1 style={styles.logo}>MGE Parrainage</h1>
             <div style={styles.userInfo}>
-              <span style={styles.userName}>{user?.nom || user?.email}</span>
-              <span style={styles.roleBadge}>{roleBadge.label}</span>
               {isMobile && (
                 <button style={styles.burgerButton} onClick={() => setMenuOpen(!menuOpen)}>
                   <span style={{...styles.burgerLine, transform: menuOpen ? 'rotate(45deg) translate(5px, 5px)' : 'none'}}></span>
@@ -249,7 +222,6 @@ export default function Layout() {
               </svg> Accueil
             </Link>
             
-            {/* Inscription - visible seulement pour RESPONSABLE */}
             {canManageStudents() && (
               <Link to="/inscription" style={{...styles.navLink, ...(location.pathname === '/inscription' ? styles.navLinkActive : {})}} onClick={closeMenu}>
                 <svg style={styles.navIcon} viewBox="0 0 24 24" fill="currentColor">

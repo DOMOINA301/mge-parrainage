@@ -1,10 +1,12 @@
 import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { saveSituation } from "../services/localStorageService";
+import { useAuth } from "../context/AuthContext";
 
 export default function CreateSituation() {
   const { studentId } = useParams();
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [loading, setLoading] = useState(false);
 
   const [form, setForm] = useState({
@@ -30,7 +32,9 @@ export default function CreateSituation() {
       montantDemande: form.montantDemande,
       urgence: form.urgence,
       statut: "EN_ATTENTE_RESPONSABLE",
-      dateSituation: new Date().toISOString()
+      dateSituation: new Date().toISOString(),
+      createdBy: user?.id,
+      createdByName: user?.nom
     };
 
     await saveSituation(situation);

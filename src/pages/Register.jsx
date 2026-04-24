@@ -139,16 +139,12 @@ export default function Register() {
 
           <div style={styles.inputGroup}>
             <label style={styles.label}>Rôle</label>
-            <select 
-              name="role" 
-              value={form.role} 
-              onChange={handleChange} 
-              style={styles.select} 
-              disabled={loading}
-            >
-              <option value="RESPONSABLE">Responsable</option>
-              <option value="SPONSOR">Sponsor</option>
-            </select>
+           // Dans Register.jsx, modifie le select des rôles :
+<select name="role" value={form.role} onChange={handleChange} style={styles.select} disabled={loading}>
+  <option value="RESPONSABLE">Responsable</option>
+  <option value="SPONSOR">Sponsor</option>
+  {/* Le rôle ADMIN n'est PAS disponible à l'inscription */}
+</select>
             <p style={styles.hint}>Le rôle ADMIN est réservé</p>
           </div>
 
