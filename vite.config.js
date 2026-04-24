@@ -3,7 +3,7 @@ import react from '@vitejs/plugin-react'
 
 export default defineConfig({
   plugins: [react()],
-  base: './',
+  base: '/',
   server: {
     host: true,
     port: 5174
@@ -11,6 +11,13 @@ export default defineConfig({
   build: {
     outDir: 'dist',
     assetsDir: 'assets',
-    chunkSizeWarningLimit: 1000  // ← AJOUTE CETTE LIGNE (limite à 1000 kB)
+    rollupOptions: {
+      output: {
+        manualChunks: undefined,
+        entryFileNames: 'assets/[name].js',
+        chunkFileNames: 'assets/[name].js',
+        assetFileNames: 'assets/[name].[ext]'
+      }
+    }
   }
 })

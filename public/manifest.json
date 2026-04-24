@@ -1,16 +1,32 @@
 {
   "name": "MGE Parrainage",
   "short_name": "MGE",
-  "description": "Application de suivi des élèves parrainés",
+  "description": "Application de suivi des élèves parrainés pour l'association humanitaire Madagascar Grandir Ensemble (MGE)",
   "start_url": "/",
   "display": "standalone",
   "theme_color": "#4da6ff",
   "background_color": "#667eea",
+  "orientation": "portrait",
+  "scope": "/",
   "icons": [
     {
       "src": "/favicon.ico",
       "sizes": "64x64",
       "type": "image/x-icon"
+    },
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
     }
-  ]
+  ],
+  "categories": ["education", "charity"],
+  "lang": "fr"
 }
